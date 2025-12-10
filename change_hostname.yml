@@ -1,0 +1,36 @@
+---
+- name: Change AP hostname with verification
+  hosts: access_point
+  gather_facts: no
+
+  tasks:
+    # 1. Show original hostname
+    - name: Get current hostname
+      cisco.ios.ios_facts:
+        gather_subset: config
+      register: ios_facts
+
+    - name: Display original hostname
+      debug:
+        msg: "Original hostname was {{ ios_facts.ansible_facts.ansible_net_hostname }}"
+
+    # 2. Change to new hostname
+    - name: Change to new hostname
+      cisco.ios.ios_config:
+        lines: hostname TEMP-AP12
+      register: change_output
+
+    - name: Hostname changed successfully
+      debug:
+        msg: "Hostname changed successfully"
+      when: change_output.changed
+
+    # 3. Verify the change
+    - name: Verify new hostname
+      cisco.ios.ios_command:
+        commands: show run | include hostname
+      register: new_info
+
+    - name: Display new hostname
+      debug:
+        msg: "New hostname: {{ new_info.stdout[0] }}"
