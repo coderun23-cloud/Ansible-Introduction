@@ -25,7 +25,7 @@
         msg: "Hostname changed successfully"
       when: change_output.changed
 
-    # 3. Verify the change
+    # 3. Verify the change after the sucessful transtion of hostname
     - name: Verify new hostname
       cisco.ios.ios_command:
         commands: show run | include hostname
